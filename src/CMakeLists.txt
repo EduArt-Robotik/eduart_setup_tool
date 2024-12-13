@@ -1,0 +1,13 @@
+add_executable(eduart_setup_tool
+  eduart_setup_tool.cpp
+)
+target_include_directories(eduart_setup_tool
+  PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>
+)
+target_link_libraries(eduart_setup_tool
+  PRIVATE
+    ${Notcurses_LIBRARIES}
+    ${Notcurses++_LIBRARIES}
+)
