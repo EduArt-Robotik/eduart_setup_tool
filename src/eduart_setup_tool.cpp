@@ -1,20 +1,122 @@
 #include <ncpp/CellStyle.hh>
 #include <ncpp/NotCurses.hh>
+#include <ncpp/Plane.hh>
+#include <ncpp/Selector.hh>
 
 #include <iostream>
 
+#include <notcurses/notcurses.h>
+
+#include <thread>
+#include <unistd.h>
+#include <vector>
+
+using namespace std::chrono_literals;
+
 int main(int argc, char** argv)
 {
+  notcurses_options options {
+    NULL, NCLOGLEVEL_VERBOSE, 0, 0, 0, 0, 0
+  };  
   ncpp::NotCurses not_curses;
 
   const ncpp::CellStyle style = not_curses.get_supported_styles();
   auto plane = not_curses.get_stdplane();
 
-  const std::uint64_t left_color = 0xff0000;
-  const std::uint64_t right_color = 0x00ff00;
+  // Image
+  if (notcurses_canopen_images(not_curses.get_notcurses())) {
+    ncvisual* image = ncvisual_from_file("podium.png");
+    ncvisual_options vopts = {
+      .n = plane->to_ncplane(),
+      .scaling = NCSCALE_STRETCH,
+    };
+  
+    if(ncvisual_blit(not_curses.get_notcurses(), image, &vopts) == NULL){
+      return 1;
+    }
+  
+    ncvisual_destroy(image);
+  }
 
-  const int ret = plane->gradient(5, 5, 30, 30, "test", NCSTYLE_BOLD, left_color, right_color, left_color, right_color);
+  // not_curses.render();
+  // std::this_thread::sleep_for(2s);
+
+  // Selector
+  ncplane_set_fg_rgb(plane->to_ncplane(), 0x40f040);
+  ncplane_putstr_aligned(plane->to_ncplane(), 0, NCALIGN_RIGHT, "selector widget demo");
+
+  ncplane_options nopts = {
+    .y = 0,
+    .x = 0,
+    .rows = 1,
+    .cols = 1,
+    .userptr = NULL,
+    .name = nullptr,
+    .resizecb = NULL,
+    .flags = 0,
+  };
+  nopts.x = plane->get_dim_x() / 2;
+  nopts.y = plane->get_dim_y() / 2;
+  // ncpp::Plane sector_plane(plane, nopts);
 
   not_curses.render();
-  std::cerr << "ret = " << ret << std::endl;
+  std::this_thread::sleep_for(2s);
+
+  std::vector<ncselector_item> items;
+  items.push_back({"Item A", "Voll das gute Item!"});
+  items.push_back({"Item B", "Voll das gute Item!"});
+  items.push_back({"Item C", "Voll das gute Item!"});
+  items.push_back({"Item D", "Voll das gute Item!"});
+  items.push_back({"Item E", "Voll das gute Item!"});
+  items.push_back({"Item F", "Voll das gute Item!"});
+  items.push_back({"Item G", "Voll das gute Item!"});
+  items.push_back({"Item H", "Voll das gute Item!"});
+  items.push_back({"Item I", "Voll das gute Item!"});
+  items.push_back({"Item J", "Voll das gute Item!"});
+  items.push_back({"Item K", "Voll das gute Item!"});
+  items.push_back({"Item Z", "Voll das gute Item!"});
+
+ 
+  ncselector_options sopts;
+  memset(&sopts, 0, sizeof(sopts));
+  sopts.maxdisplay = 10;
+  sopts.items = items.data();
+  sopts.title = "EduArt Software Select";
+  sopts.secondary = "pick one (you will die regardless)";
+  sopts.footer = "press q to exit (there is no exit)";
+  sopts.defidx = 1;
+  sopts.boxchannels = NCCHANNELS_INITIALIZER(0x20, 0xe0, 0x40, 0x20, 0x20, 0x20);
+  sopts.opchannels = NCCHANNELS_INITIALIZER(0xe0, 0x80, 0x40, 0, 0, 0);
+  sopts.descchannels = NCCHANNELS_INITIALIZER(0x80, 0xe0, 0x40, 0, 0, 0);
+  sopts.footchannels = NCCHANNELS_INITIALIZER(0xe0, 0, 0x40, 0x20, 0, 0);
+  sopts.titlechannels = NCCHANNELS_INITIALIZER(0xff, 0xff, 0x80, 0, 0, 0x20);
+  uint64_t bgchannels = NCCHANNELS_INITIALIZER(0, 0x20, 0, 0, 0x20, 0);
+  ncchannels_set_fg_alpha(&bgchannels, NCALPHA_BLEND);
+  ncchannels_set_bg_alpha(&bgchannels, NCALPHA_BLEND);
+  // ncpp::Selector selector(plane, &sopts);
+ 
+  struct ncplane* seln;
+  // seln = ncplane_create(plane->to_ncplane(), &nopts);
+  // ncplane_set_base(seln, "", 0, bgchannels);
+  // sopts.title = "short round title";
+  seln = ncplane_create(plane->to_ncplane(), &nopts);
+  ncplane_set_base(seln, "", 0, bgchannels);
+  auto selector = ncselector_create(seln, &sopts);
+
+  // selector.additem(items);
+
+  not_curses.render();
+  std::this_thread::sleep_for(10s);
 }
+
+// int main(){
+//   notcurses_options options {
+//     NULL, NCLOGLEVEL_VERBOSE, 0, 0, 0, 0, 0
+//   };
+
+//   auto instance = notcurses_init(&options, nullptr);
+
+//   sleep(2);
+
+//   notcurses_stop(instance);
+// }
