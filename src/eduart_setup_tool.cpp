@@ -1,19 +1,24 @@
+#include <memory>
 #include <ncpp/CellStyle.hh>
 #include <ncpp/NotCurses.hh>
 #include <ncpp/Plane.hh>
 #include <ncpp/Selector.hh>
-
-#include <iostream>
 
 #include <notcurses/notcurses.h>
 
 #include <thread>
 #include <unistd.h>
 #include <vector>
+#include <iostream>
+
+#include "shell_executer.hpp"
+#include "root_permission_check.hpp"
+
+#include "application_main_menu_view.hpp"
 
 using namespace std::chrono_literals;
 
-int main(int argc, char** argv)
+int test_tui()
 {
   notcurses_options options {
     NULL, NCLOGLEVEL_VERBOSE, 0, 0, 0, 0, 0
@@ -65,17 +70,17 @@ int main(int argc, char** argv)
   std::vector<ncselector_item> items;
   items.push_back({"Item A", "Voll das gute Item!"});
   items.push_back({"Item B", "Voll das gute Item!"});
-  items.push_back({"Item C", "Voll das gute Item!"});
-  items.push_back({"Item D", "Voll das gute Item!"});
-  items.push_back({"Item E", "Voll das gute Item!"});
-  items.push_back({"Item F", "Voll das gute Item!"});
-  items.push_back({"Item G", "Voll das gute Item!"});
-  items.push_back({"Item H", "Voll das gute Item!"});
-  items.push_back({"Item I", "Voll das gute Item!"});
-  items.push_back({"Item J", "Voll das gute Item!"});
-  items.push_back({"Item K", "Voll das gute Item!"});
-  items.push_back({"Item Z", "Voll das gute Item!"});
-
+  // items.push_back({"Item C", "Voll das gute Item!"});
+  // items.push_back({"Item D", "Voll das gute Item!"});
+  // items.push_back({"Item E", "Voll das gute Item!"});
+  // items.push_back({"Item F", "Voll das gute Item!"});
+  // items.push_back({"Item G", "Voll das gute Item!"});
+  // items.push_back({"Item H", "Voll das gute Item!"});
+  // items.push_back({"Item I", "Voll das gute Item!"});
+  // items.push_back({"Item J", "Voll das gute Item!"});
+  // items.push_back({"Item K", "Voll das gute Item!"});
+  // items.push_back({"Item Z", "Voll das gute Item!"});
+  items.push_back({nullptr, nullptr}); // maybe it needs this line as termination
  
   ncselector_options sopts;
   memset(&sopts, 0, sizeof(sopts));
@@ -107,16 +112,41 @@ int main(int argc, char** argv)
 
   not_curses.render();
   std::this_thread::sleep_for(10s);
+
+  return 0;
 }
 
-// int main(){
-//   notcurses_options options {
-//     NULL, NCLOGLEVEL_VERBOSE, 0, 0, 0, 0, 0
-//   };
+void test_executer()
+{
+  eduart::setup_tool::ShellExecuter executer("test -f ls");
 
-//   auto instance = notcurses_init(&options, nullptr);
+  std::cout << "stdout:\n" <<  executer.stdOut() << std::endl;
+  std::cout << "return code = " << executer.returnCode() << std::endl;
+}
 
-//   sleep(2);
+void check_root_permission()
+{
+  std::cout << "has root permission = " << (eduart::setup_tool::RootPermissionCheck::instance().hasPermission() ? "yes" : "no") << std::endl;
+}
 
-//   notcurses_stop(instance);
-// }
+void test_main_menu()
+{
+  notcurses_options options {
+    NULL, NCLOGLEVEL_VERBOSE, 0, 0, 0, 0, 0
+  };  
+  std::shared_ptr<ncpp::NotCurses> not_curses = std::make_shared<ncpp::NotCurses>();
+
+  eduart::setup_tool::ApplicationMainMenuView main_menu_view(not_curses);
+
+  main_menu_view.show();
+  std::this_thread::sleep_for(1s);
+}
+
+int main(int argc, char** argv)
+{
+  (void)argc;
+  (void)argv;
+  // check_root_permission();
+  test_main_menu();
+  std::cout << "exit main" << std::endl;
+}

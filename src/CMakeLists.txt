@@ -1,5 +1,8 @@
 add_executable(eduart_setup_tool
   eduart_setup_tool.cpp
+  shell_executer.cpp
+  root_permission_check.cpp
+  application_main_menu_view.cpp
 )
 target_include_directories(eduart_setup_tool
   PUBLIC
