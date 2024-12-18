@@ -5,6 +5,7 @@
  */
 #pragma once
 
+#include "application_main_menu_view.hpp"
 #include "application_state.hpp"
 
 #include <memory>
@@ -12,13 +13,13 @@
 namespace eduart {
 namespace setup_tool {
 
-class ApplicationMainMenu : public ApplicationSate
+class ApplicationMainMenu : public ApplicationSateWithView<ApplicationMainMenuView>
 {
 public:
   ApplicationMainMenu(std::shared_ptr<ncpp::NotCurses>& not_curses);
   ~ApplicationMainMenu() override = default;
 
-  std::shared_ptr<ApplicationSate> perform() override;
+  std::shared_ptr<ApplicationSate> process() override;
 
 private:
 

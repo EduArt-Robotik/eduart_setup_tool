@@ -7,7 +7,9 @@
 
 #include "application_view.hpp"
 
+#include <cstddef>
 #include <memory>
+#include <string>
 
 struct ncselector;
 struct ncplane;
@@ -22,12 +24,15 @@ public:
   ~ApplicationMainMenuView() override;
 
   void show() override;
-  void selectNextItem();
-  void selectPreviousItem();
+  bool processInput(const ncinput& input) override;
+  const std::size_t selectedItem() const {
+    return static_cast<std::size_t>(_selected_item);
+  }
 
 private:
   ncselector* _selector = nullptr;
   ncplane* _selector_plane = nullptr;
+  int _selected_item = -1;
 };
 
 } // end namespace setup tool

@@ -11,6 +11,7 @@
 #include <vector>
 #include <iostream>
 
+#include "application_main_menu.hpp"
 #include "shell_executer.hpp"
 #include "root_permission_check.hpp"
 
@@ -136,10 +137,9 @@ void test_main_menu()
   };  
   std::shared_ptr<ncpp::NotCurses> not_curses = std::make_shared<ncpp::NotCurses>();
 
-  eduart::setup_tool::ApplicationMainMenuView main_menu_view(not_curses);
+  eduart::setup_tool::ApplicationMainMenu main_menu(not_curses);
 
-  main_menu_view.show();
-  std::this_thread::sleep_for(1s);
+  main_menu.process();
 }
 
 int main(int argc, char** argv)

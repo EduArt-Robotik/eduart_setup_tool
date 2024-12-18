@@ -4,6 +4,9 @@
 #include <ncpp/NotCurses.hh>
 #include <notcurses/notcurses.h>
 
+#include <stdexcept>
+#include <cstring>
+
 namespace eduart {
 namespace setup_tool {
 
@@ -14,6 +17,17 @@ static ncselector_item menu_items[] = {
   { "Show Available Software", "Goes online and searches for EduArt software that could be installed."},
   { nullptr, nullptr }
 };
+
+static int get_item_index(const char* item)
+{
+  for (int i = 0; i < sizeof(menu_items) / sizeof(ncselector_item); ++i) {
+    if (std::strcmp(menu_items[i].option, item) == 0) {
+      return i;
+    }
+  }
+
+  return -1;
+}
 
 ApplicationMainMenuView::ApplicationMainMenuView(std::shared_ptr<ncpp::NotCurses>& not_curses)
   : ApplicationView(not_curses)
@@ -69,8 +83,8 @@ void ApplicationMainMenuView::show()
     sopts.items = menu_items;
     sopts.title = "EduArt Software Select";
     sopts.secondary = "pick one (you will die regardless)";
-    sopts.footer = "press q to exit (there is no exit)";
-    sopts.defidx = 1;
+    sopts.footer = "press q to exit";
+    sopts.defidx = 0;
     sopts.boxchannels   = NCCHANNELS_INITIALIZER(0x20, 0xe0, 0x40, 0x20, 0x20, 0x20);
     sopts.opchannels    = NCCHANNELS_INITIALIZER(0xe0, 0x80, 0x40, 0, 0, 0);
     sopts.descchannels  = NCCHANNELS_INITIALIZER(0x80, 0xe0, 0x40, 0, 0, 0);
@@ -86,41 +100,23 @@ void ApplicationMainMenuView::show()
   }
 
   _not_curses->render();
+  _selected_item = get_item_index(ncselector_selected(_selector));
 
-  uint32_t keypress;
-  ncinput ni;
+  if (_selected_item < 0) {
+    throw std::runtime_error("ApplicationMainMenuView: something went wrong during selected item estimation. Item index not found.");
+  }
+}
 
-  while ((keypress = notcurses_get_blocking(_not_curses->get_notcurses(), &ni)) != (uint32_t)-1) {
-    if(!ncselector_offer_input(_selector, &ni)){
-      if(ni.evtype == NCTYPE_RELEASE){
-        continue;
-      }
-      if(keypress == 'q'){
-        break;
-      }
-    }
+bool ApplicationMainMenuView::processInput(const ncinput& input)
+{
+  if (ncselector_offer_input(_selector, &input)) {
+    // was relevant
     _not_curses->render();
-  }
-}
-
-void ApplicationMainMenuView::selectNextItem()
-{
-  if (_selector == nullptr) {
-    // first show needs to be called once
-    return;
+    _selected_item = get_item_index(ncselector_selected(_selector));
+    return true;
   }
 
-  ncselector_nextitem(_selector);
-}
-
-void ApplicationMainMenuView::selectPreviousItem()
-{
-  if (_selector == nullptr) {
-    // first show needs to be called once
-    return;    
-  }
-
-  ncselector_previtem(_selector);
+  return false;
 }
 
 } // end namespace setup tool

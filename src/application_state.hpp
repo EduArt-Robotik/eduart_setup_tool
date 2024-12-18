@@ -6,6 +6,7 @@
 #pragma once
 
 #include "application_view.hpp"
+
 #include <memory>
 
 namespace eduart {
@@ -14,28 +15,41 @@ namespace setup_tool {
 class ApplicationSate
 {
 public:
-  virtual ~ApplicationSate();
+  virtual ~ApplicationSate() = default;
 
 protected:
-  ApplicationSate(std::unique_ptr<ApplicationView> view) : _view(std::move(view)) { }
+  ApplicationSate(std::shared_ptr<ncpp::NotCurses> not_curses)
+    : _not_curses(not_curses)
+  { }
 
 public:
   /**
    * \brief Performs current state until it is finished. The next application state will be returned. If returned state is null it means there is no state after.
    */
-  virtual std::shared_ptr<ApplicationSate> perform() = 0;
+  virtual std::shared_ptr<ApplicationSate> process() = 0;
 
-  inline const ApplicationView& view() const { return *_view; }
+  std::shared_ptr<ncinput> getInput();
 
 protected:
-  std::unique_ptr<ApplicationView> _view;
+  std::shared_ptr<ncpp::NotCurses> _not_curses;
 };
 
 template <class View>
-class ApplicationSateViewCaster : public ApplicationSate
+class ApplicationSateWithView : public ApplicationSate
 {
+public:
+  ~ApplicationSateWithView() override = default;
+
 protected:
-  inline View& cast() { return static_cast<View&>(*_view); }
+  ApplicationSateWithView(std::unique_ptr<ApplicationView> view, std::shared_ptr<ncpp::NotCurses> not_curses)
+    : ApplicationSate(not_curses)
+    , _view(std::move(view))
+  { }
+
+  inline View& view() { return static_cast<View&>(*_view); }
+
+private:
+  std::unique_ptr<ApplicationView> _view;
 };
 
 } // end namespace setup tool
