@@ -5,6 +5,7 @@ add_executable(eduart_setup_tool
   application_state.cpp
   application_main_menu.cpp
   application_main_menu_view.cpp
+  eduart_software_querier.cpp
 )
 target_include_directories(eduart_setup_tool
   PUBLIC
@@ -15,4 +16,5 @@ target_link_libraries(eduart_setup_tool
   PRIVATE
     ${Notcurses_LIBRARIES}
     ${Notcurses++_LIBRARIES}
+    nlohmann_json::nlohmann_json
 )

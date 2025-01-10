@@ -14,6 +14,7 @@
 #include "application_main_menu.hpp"
 #include "shell_executer.hpp"
 #include "root_permission_check.hpp"
+#include "eduart_software_querier.hpp"
 
 #include "application_main_menu_view.hpp"
 
@@ -142,11 +143,18 @@ void test_main_menu()
   main_menu.process();
 }
 
+void test_software_querier()
+{
+  eduart::setup_tool::EduArtSoftwareQuerier querier("../../resources/eduart-software-catalog.json");
+}
+
 int main(int argc, char** argv)
 {
   (void)argc;
   (void)argv;
   // check_root_permission();
-  test_main_menu();
+  // test_main_menu();
+  test_software_querier();
+
   std::cout << "exit main" << std::endl;
 }
