@@ -2,7 +2,13 @@
   "software": [
     {
       "name": "edu_robot",
-      "url": "https://github.com/EduArt-Robotik/edu_robot.git"
+      "url": "https://github.com/EduArt-Robotik/edu_robot.git",
+      "branch": "feature/docker_service_as_systemd"
+    },
+    {
+      "name": "edu_robot_control",
+      "url": "https://github.com/EduArt-Robotik/edu_robot_control.git",
+      "branch": "main"
     }
   ]
 }

@@ -145,7 +145,7 @@ void test_main_menu()
 
 void test_software_querier()
 {
-  eduart::setup_tool::EduArtSoftwareQuerier querier("../../resources/eduart-software-catalog.json");
+  eduart::setup_tool::EduArtSoftwareQuerier querier("/home/knueppl/repos/eduart/eduart_setup_tool/resources/eduart-software-catalog.json");
 }
 
 int main(int argc, char** argv)
