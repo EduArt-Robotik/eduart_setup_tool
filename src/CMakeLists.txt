@@ -6,6 +6,7 @@ add_executable(eduart_setup_tool
   application_main_menu.cpp
   application_main_menu_view.cpp
   eduart_software_querier.cpp
+  eduart_software_service.cpp
 )
 target_include_directories(eduart_setup_tool
   PUBLIC

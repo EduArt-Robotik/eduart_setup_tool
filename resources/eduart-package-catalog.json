@@ -1,5 +1,5 @@
 {
-  "software": [
+  "package": [
     {
       "name": "edu_robot",
       "url": "https://github.com/EduArt-Robotik/edu_robot.git",
